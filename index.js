@@ -16,6 +16,7 @@ app.get('/posts', (req, res) => {
 
 app.post('/events', (req, res) => {
   const { type, data } = req.body
+  console.log(`receiving ${type} event`)
   
   switch(type) {
     case 'PostCreated':
@@ -39,6 +40,7 @@ const handleCommentCreatedEvent = (data) => {
   posts[postId].comments.push({id, content})
 }
 
-app.listen(4002, () => {
-  console.log('Listening on 4002')
+const port = 4002
+app.listen(port, () => {
+  console.log(`Listening on ${port}`)
 });

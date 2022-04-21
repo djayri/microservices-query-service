@@ -8,25 +8,28 @@ app.use(cors());
 
 const posts = {}
 // structure of posts
-// {postId:{id, title, comments:[{id, content}]}}
+// {postId:{id, title, comments:[{id, content, status}]}}
 
 app.get('/posts', (req, res) => {
-  res.send(posts)
+  res.send(posts);
 });
 
 app.post('/events', (req, res) => {
-  const { type, data } = req.body
-  console.log(`receiving ${type} event`)
+  const { type, data } = req.body;
+  console.log(`receiving ${type} event`);
   
   switch(type) {
     case 'PostCreated':
       handlePostCreatedEvent(data);
       break;
     case 'CommentCreated':
-      handleCommentCreatedEvent(data)
+      handleCommentCreatedEvent(data);
+      break;
+    case 'CommentUpdated':
+      handleCommentUpdatedEvent(data);
       break;
   }
-  res.send({})
+  res.send({});
 })
 
 const handlePostCreatedEvent = (data) => {
@@ -36,11 +39,19 @@ const handlePostCreatedEvent = (data) => {
   }
 }
 const handleCommentCreatedEvent = (data) => {
-  const {id, postId, content} = data;
-  posts[postId].comments.push({id, content})
+  const {id, postId, content, status} = data;
+  posts[postId].comments.push({id, content, status});
+}
+const handleCommentUpdatedEvent = (data) => {
+  const { id, postId, status } = data;
+  if(!posts[postId]) {
+    return
+  }
+  const comment = posts[postId].comments.find(comment => comment.id === id);
+  comment.status = status;
 }
 
 const port = 4002
 app.listen(port, () => {
-  console.log(`Listening on ${port}`)
+  console.log(`Listening on ${port}`);
 });
